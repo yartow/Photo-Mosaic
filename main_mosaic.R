@@ -11,21 +11,20 @@ image_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Images"
 # to remove similar images from the image folder
 source(paste0(getwd(), "/", "remove_similar_images.R"))
 
-data_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Data"
 
 # uncomment the following line if you want to pick up where it left off last run
+data_folder <- paste0(getwd(), "/Data")
 intermediate_results <- paste0(data_folder, "/intermediate_results.csv")
-# target_image_path <- paste0(data_folder, "/Margaret.jpg")
+output_csv <- paste0(data_folder, "/image_data.csv")
 target_image_path <- paste0(data_folder, "/Family.jpg")
 output_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Output"
 output_file <- paste0(output_folder, "/Margaret_mosaic.png")
 thumbnail_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Thumbnails"
 
 # Run the preprocessing
-image_folder <- image_folder
+image_folder <- paste0(getwd(), "/Images")
 tile_size <- 64
-output_folder <- thumbnail_folder
-output_csv <- paste0(data_folder, "/image_data.csv")
+
 
 # Do a check here on whether pictures for this target image have already been preprocessed 
 force_process <- TRUE
@@ -39,6 +38,7 @@ if(preprocessed && !force_process){
   
   preprocess_images(image_folder, tile_size, thumbnail_folder, output_csv)
   small_images <- load_preprocessed_images(output_csv)
+  
 }
 
 # create the actual mosaic
@@ -50,8 +50,10 @@ if(preprocessed && !force_process){
 # output_file <- paste0(output_folder, "/Margaret_mosaic.png")
 
 # Create the photomosaic
-result <- create_photomosaic(target_image_path, small_images, output_file, 
-                             target_width = 8192, tile_size = tile_size)
+result <- create_photomosaic_GPT(target_image_path, small_images, output_file, 
+                       target_width = 8192, tile_size = tile_size,
+                         intermediate_results_file = "intermediate_results.csv",
+                         force_square = FALSE)
 
 # Display the mosaic
 print(result$mosaic)
