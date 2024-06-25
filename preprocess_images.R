@@ -27,13 +27,14 @@ preprocess_images <- function(image_folder, tile_size, output_folder,
                            stringsAsFactors = FALSE)
   
   for (img_path in image_files) {
-    img <- image_read(img_path)
-    # img_resized <- image_scale(img, paste0(tile_size, "x", tile_size, "!"))
     
+    # read the image
+    img <- image_read(img_path)
     
     # scaled based on width or height, depending on which one is bigger 
     new_img <- image_scale(img, ifelse(imageInfo$width <= imageInfo$height, 
-                                       paste0(tile_size, "x"), paste0("x", tile_size)))
+                                       paste0(tile_size, "x"), 
+                                       paste0("x", tile_size)))
     
     # crop the image
     img_resized <- image_crop(new_img, paste0(tile_size, "x", tile_size, "+0+0"))

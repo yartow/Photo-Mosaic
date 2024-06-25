@@ -58,6 +58,7 @@ create_photomosaic_GPT <- function(target_image_path, small_images, output_file,
   target_height <- target_info$height
   
   # Crop to square if required
+  # TODO this forcing should occur in the cropping
   if (force_square) {
     crop_size <- floor(min(target_width, target_height) / tile_size) * tile_size
     target_image <- image_crop(target_image, paste0(crop_size, "x", crop_size, "+0+0"))
@@ -72,7 +73,8 @@ create_photomosaic_GPT <- function(target_image_path, small_images, output_file,
   mosaic <- image_blank(target_width, target_height, color = "white")
   
   # Initialize a data frame to store the tile information
-  tile_info <- data.frame(x = integer(), y = integer(), image_path = character(), stringsAsFactors = FALSE)
+  tile_info <- data.frame(x = integer(), y = integer(), 
+                          image_path = character(), stringsAsFactors = FALSE)
   
   # Check if intermediate results file exists and load it if it does
   if (file.exists(intermediate_results_file)) {
@@ -154,20 +156,81 @@ load_preprocessed_images <- function(image_data_csv) {
 }
 
 # Function to preprocess images
-preprocess_images <- function(image_folder, tile_size, thumbnail_folder, output_csv) {
-  image_files <- list.files(image_folder, pattern = "\\.(jpg|jpeg|png|bmp|tiff)$", full.names = TRUE)
+preprocess_images_3 <- function(image_folder, tile_size, thumbnail_folder, output_csv) {
+
+  image_files <- list.files(image_folder, 
+                            pattern = "\\.(jpg|jpeg|png|bmp|tiff)$", 
+                            full.names = TRUE)
   
-  image_data <- data.frame(path = character(), avg_r = numeric(), avg_g = numeric(), avg_b = numeric(), stringsAsFactors = FALSE)
+  image_data <- data.frame(path = character(), avg_r = numeric(), 
+                           avg_g = numeric(), avg_b = numeric(), 
+                           stringsAsFactors = FALSE)
   
   for (img_path in image_files) {
+    
+    # read the image
     img <- image_read(img_path)
+    
+    # # Crop to square if required
+    # # TODO this forcing should occur in the cropping
+    
+    
+    keep_aspect_ratio <- TRUE
+    # To keep the aspect ratio when creating square thumbnails we crop the image
+    # based on its shortest side
+    if (keep_aspect_ratio) {
+      
+      img_resized 
+      
+      if (target_width > target_height){
+        
+        image_scale(img, paste0(tile_size, "x"))        
+        
+      } else {
+        
+        image_scale(img, paste0("x", tile_size))
+        
+      }
+
+      # get the shortest side
+      decrease_factor <- (target_height / tile_size)
+      
+      # rescale the image 
+      img_resized <- image_scale(img, paste0(tile_size, "x", tile_size, "!"))
+      
+      crop_size <- floor(min(target_width, target_height) / tile_size) * tile_size
+      
+      target_image <- image_crop(target_image, 
+                                 paste0(target_height / decrease_factor,
+                                  "x", target_width / decrease_factor, "+0+0"))
+      img <- image_crop(img, paste0(crop_size, "x", crop_size, "+0+0"))
+
+      # Update dimensions after cropping
+      target_info <- image_info(target_image)
+      target_width <- target_info$width
+      target_height <- target_info$height
+    }
+    
+    # rescale the image 
     img_resized <- image_scale(img, paste0(tile_size, "x", tile_size, "!"))
+    
+    # get the average color
     img_avg_color <- average_color(img_resized)
-    image_data <- image_data %>% add_row(path = img_path, avg_r = img_avg_color[1], avg_g = img_avg_color[2], avg_b = img_avg_color[3])
+    
+    # create a new row in memory with the average image colors for each image
+    image_data <- image_data %>% add_row(path = img_path, 
+                                         avg_r = img_avg_color[1], 
+                                         avg_g = img_avg_color[2], 
+                                         avg_b = img_avg_color[3])
+    
+    # write the image to the thumbnail folder
     image_write(img_resized, file.path(thumbnail_folder, basename(img_path)))
+    
   }
   
+  # write the image data to the CSV file
   write_csv(image_data, output_csv)
+  
 }
 
 # Main script execution

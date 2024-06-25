@@ -9,7 +9,7 @@ source(paste0(getwd(), "/", "Mosaic_preprocessed_GPT.R"))
 # Specify the paths to the target image and the folder containing the small images
 image_folder <- paste0(getwd(), "/Images")
 
-removeSimilarImages <- FALSE
+removeSimilarImages <- TRUE
 # to remove similar images from the image folder
 if (removeSimilarImages){
   
@@ -21,17 +21,14 @@ if (removeSimilarImages){
 data_folder <- paste0(getwd(), "/Data")
 
 output_csv <- paste0(data_folder, "/image_data.csv")
-target_image_path <- paste0(data_folder, "/Family.jpg")
-output_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Output"
-thumbnail_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Thumbnails"
+target_image_path <- paste0(data_folder, "/Margaret_portrait.jpg")
+output_folder <- paste0(getwd(), "/Output")
+thumbnail_folder <- paste0(getwd(), "/Thumbnails")
 
 # Run the preprocessing
 image_folder <- paste0(getwd(), "/Images")
 tile_size <- 64
 target_width <- 8192*2
-
-# Full file path
-file_path <- "/Users/andrewyong/Documents/GitHub/Mosaic/Data/Family.jpg"
 
 # Extract the file name with extension
 file_name_with_ext <- basename(target_image_path)
@@ -52,22 +49,16 @@ if(preprocessed && !force_process){
   
 } else {
   
+  # TODO make it such that existing images are skipped
+  # TODO there is still one error with images that are higher than they are wide, which leaves a white bar
   preprocess_images(image_folder, tile_size, thumbnail_folder, output_csv)
   small_images <- load_preprocessed_images(output_csv)
   
 }
 
-# create the actual mosaic
-# # Specify the paths to the target image and the preprocessed image data
-# data_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Data"
-# target_image_path <- paste0(data_folder, "/Margaret.jpg")
-# intermediate_results <- paste0(data_folder, "/intermediate_results.csv")
-# output_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Output"
-# output_file <- paste0(output_folder, "/Margaret_mosaic.png")
-
 # Create the photomosaic
 result <- create_photomosaic_GPT(target_image_path, small_images, output_file, 
-                       target_width = 8192*2, tile_size = tile_size,
+                       target_width = target_width, tile_size = tile_size,
                          intermediate_results_file = "intermediate_results.csv",
                          force_square = FALSE)
 
