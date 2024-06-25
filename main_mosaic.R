@@ -3,32 +3,48 @@
 # source files
 source(paste0(getwd(), "/", "preprocess_images.R"))
 source(paste0(getwd(), "/", "load_preprocessed_images.R"))
-source(paste0(getwd(), "/", "Mosaic_preprocessed.R"))
+source(paste0(getwd(), "/", "Mosaic_preprocessed_GPT.R"))
 
 
 # Specify the paths to the target image and the folder containing the small images
-image_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Images"
-# to remove similar images from the image folder
-source(paste0(getwd(), "/", "remove_similar_images.R"))
+image_folder <- paste0(getwd(), "/Images")
 
+removeSimilarImages <- FALSE
+# to remove similar images from the image folder
+if (removeSimilarImages){
+  
+  source(paste0(getwd(), "/", "remove_similar_images.R"))
+  
+}
 
 # uncomment the following line if you want to pick up where it left off last run
 data_folder <- paste0(getwd(), "/Data")
-intermediate_results <- paste0(data_folder, "/intermediate_results.csv")
+
 output_csv <- paste0(data_folder, "/image_data.csv")
 target_image_path <- paste0(data_folder, "/Family.jpg")
 output_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Output"
-output_file <- paste0(output_folder, "/Margaret_mosaic.png")
 thumbnail_folder <- "/Users/andrewyong/Documents/GitHub/Mosaic/Thumbnails"
 
 # Run the preprocessing
 image_folder <- paste0(getwd(), "/Images")
 tile_size <- 64
+target_width <- 8192*2
 
+# Full file path
+file_path <- "/Users/andrewyong/Documents/GitHub/Mosaic/Data/Family.jpg"
 
-# Do a check here on whether pictures for this target image have already been preprocessed 
+# Extract the file name with extension
+file_name_with_ext <- basename(target_image_path)
+
+# Remove the extension to get the file name
+file_name <- tools::file_path_sans_ext(file_name_with_ext)
+output_file <- paste0(output_folder, "/", file_name, "_", target_width, ".png")
+intermediate_results <- paste0(data_folder, "/intermediate_results_", file_name, "_", target_width, ".csv")
+
 force_process <- TRUE
 preprocessed <- FALSE
+
+# Load the preprocessed images unless `force_process` is TRUE
 if(preprocessed && !force_process){
   
   # Load preprocessed images and average colors
@@ -51,7 +67,7 @@ if(preprocessed && !force_process){
 
 # Create the photomosaic
 result <- create_photomosaic_GPT(target_image_path, small_images, output_file, 
-                       target_width = 8192, tile_size = tile_size,
+                       target_width = 8192*2, tile_size = tile_size,
                          intermediate_results_file = "intermediate_results.csv",
                          force_square = FALSE)
 
