@@ -59,12 +59,11 @@ if(preprocessed && !force_process){
 # Create the photomosaic
 result <- create_photomosaic_GPT(target_image_path, small_images, output_file, 
                        target_width = target_width, tile_size = tile_size,
-                         intermediate_results_file = "intermediate_results.csv",
+                         intermediate_results_file = intermediate_results,
                          force_square = FALSE)
 
 # Display the mosaic
 print(result$mosaic)
+print(date())
 
-# The tile information is stored in result$tile_info
-print(result$tile_info)
 
