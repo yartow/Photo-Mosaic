@@ -3,7 +3,7 @@
 # source files
 source(paste0(getwd(), "/", "preprocess_images.R"))
 source(paste0(getwd(), "/", "load_preprocessed_images.R"))
-source(paste0(getwd(), "/", "Mosaic_preprocessed_GPT.R"))
+source(paste0(getwd(), "/", "Mosaic_preprocessed_GPT.R")) # <-- right version?
 
 
 # Specify the paths to the target image and the folder containing the small images
@@ -37,7 +37,7 @@ file_name_with_ext <- basename(target_image_path)
 file_name <- tools::file_path_sans_ext(file_name_with_ext)
 output_file <- paste0(output_folder, "/", file_name, "_", target_width, ".png")
 intermediate_results <- paste0(data_folder, "/intermediate_results_", file_name, "_", target_width, ".csv")
-
+#   date()
 force_process <- TRUE
 preprocessed <- FALSE
 
@@ -57,6 +57,7 @@ if(preprocessed && !force_process){
 }
 
 # Create the photomosaic
+# TODO Check which version is latest
 result <- create_photomosaic_GPT(target_image_path, small_images, output_file, 
                        target_width = target_width, tile_size = tile_size,
                          intermediate_results_file = intermediate_results,

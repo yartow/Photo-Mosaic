@@ -17,7 +17,7 @@ average_color <- function(img) {
 # Function to create a photomosaic and save tile information
 create_photomosaic_GPT <- function(target_image_path, small_images, output_file, 
                                target_width = 4000, tile_size = 32,
-                               intermediate_results = "intermediate_results.csv",
+                               intermediate_results_file = "intermediate_results.csv",
                                force_square = FALSE) {
   
   # Read the target image
